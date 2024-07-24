@@ -63,6 +63,24 @@ export default defineConfig({
     UnoCSS(),
   ],
 
+  build: {
+    lib: {
+      entry: './index.js',
+      name: 'DateMarker',
+      fileName: (format) => `date-marker.${format}.js`
+    },
+    rollupOptions: {
+      // 確保外部化處理那些你不想打包進庫的依賴
+      external: ['vue'],
+      output: {
+        // 在 UMD 構建模式下為這些外部化的依賴提供一個全局變量
+        globals: {
+          vue: 'Vue'
+        }
+      }
+    }
+  },
+
   // https://github.com/vitest-dev/vitest
   test: {
     environment: 'jsdom',
