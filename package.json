@@ -28,15 +28,14 @@
     "postinstall": "npx simple-git-hooks"
   },
   "dependencies": {
-    "@vue/language-plugin-pug": "^2.0.29",
     "@vueuse/core": "^10.9.0",
-    "alstoncao/date-marker": "file:./alstoncao-date-marker-0.0.2.tgz",
     "dayjs": "^1.11.12",
-    "pug": "^3.0.3",
     "vue": "^3.4.27",
     "vue-router": "^4.3.2"
   },
   "devDependencies": {
+    "pug": "^3.0.3",
+    "@vue/language-plugin-pug": "^2.0.29",
     "@antfu/eslint-config": "^2.18.1",
     "@iconify-json/carbon": "^1.1.33",
     "@types/node": "^20.12.12",
