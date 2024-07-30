@@ -4,5 +4,8 @@ export default antfu(
   {
     unocss: true,
     formatters: true,
+    extends: [
+      'plugin:vue-pug/vue3-recommended'
+    ]
   },
 )

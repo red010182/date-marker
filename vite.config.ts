@@ -10,6 +10,7 @@ import VueMacros from 'unplugin-vue-macros/vite'
 import VueRouter from 'unplugin-vue-router/vite'
 import { VueRouterAutoImports } from 'unplugin-vue-router'
 import pugPlugin from 'vite-plugin-pug'
+import { resolve } from "node:path"
 
 export default defineConfig({
   resolve: {
@@ -65,7 +66,7 @@ export default defineConfig({
 
   build: {
     lib: {
-      entry: './index.js',
+      entry: resolve(__dirname, "src/index.ts"),
       name: 'DateMarker',
       fileName: (format) => `date-marker.${format}.js`
     },

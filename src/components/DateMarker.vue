@@ -1,4 +1,4 @@
-ea<script setup lang="ts">
+<script setup lang="ts">
 import dayjs from 'dayjs'
 import { chunkArray } from '~/lib/ChunkArray'
 
@@ -10,54 +10,71 @@ const props = defineProps<{
   disableDates?: string[],
 }>()
 
+/**
+ * Variables
+ */
 const rowNum = 31
 const colNum = 12
+const today = dayjs()
 
-const dates = ref<boolean[]>(new Array(rowNum * colNum).fill(false))
-const map = computed(() => chunkArray(dates.value, colNum))
+
+/**
+ * Observable variables
+ */
+const cells = ref<boolean[]>(new Array(rowNum * colNum).fill(false))
+const cellLabels = ref<string[]>(new Array(rowNum * colNum).fill(''))
 const rowHeaders = ref(new Array(rowNum).fill(false))
 const colHeaders = ref(new Array(colNum).fill(false))
-const today = dayjs()
-const dateString = computed(() => today.format('YYYY-MM-DD'))
-const year = computed(() => +dateString.value.substring(0,4))
-const month = computed(() => +dateString.value.substring(5,7))
-const theDay = computed(() => +dateString.value.substring(8,10))
-
+const weekSelector = ref({
+  fromMonth: 1,
+  toMonth: 12,
+  weekday: 1,
+})
 const notDisplayWeekdayInCell = ref(props.notDisplayWeekdayInCell)
 const weekdayLabels = ref(props.weekdayLabels ?? ['一','二','三','四','五','六','日'])
 const monthLabels = ref(props.monthLabels ?? ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'])
 const dayLabels = ref(props.dayLabels ?? ['1日','2日','3日','4日','5日','6日','7日','8日','9日','10日','11日','12日','13日','14日','15日','16日','17日','18日','19日','20日','21日','22日','23日','24日','25日','26日','27日','28日','29日','30日','31日'])
 const disableDates = ref(props.disableDates ?? [])
-const getDate = (x: number, y: number) => {
+
+
+/**
+ * Computed
+ */
+const map = computed(() => chunkArray(cells.value, colNum))
+const dateString = computed(() => today.format('YYYY-MM-DD'))
+const year = computed(() => +dateString.value.substring(0,4))
+const month = computed(() => +dateString.value.substring(5,7))
+const theDay = computed(() => +dateString.value.substring(8,10))
+
+/**
+ * Functions
+ */
+const getCell = (x: number, y: number) => {
   if(x >= 0 && x < rowNum && y >=0 && y < colNum) {
-    return dates.value[x * colNum + y]
+    return cells.value[x * colNum + y]
   }
 }
-const setDate = (x: number, y: number, v: boolean) => {
+const setCell = (x: number, y: number, v: boolean) => {
   if(x >= 0 && x < rowNum && y >=0 && y < colNum && !disableCell(x,y)) {
-    dates.value[x * colNum + y] = v
+    cells.value[x * colNum + y] = v
   }
 }
 const toggleDate = (x: number, y:number) => {
-  setDate(x, y, !getDate(x,y))
+  setCell(x, y, !getCell(x,y))
 }
 const toggleCol = (y: number) => {
   colHeaders.value[y] = !colHeaders.value[y]
-  for(let x = 0; x < map.value.length; x++) {
-    setDate(x, y, colHeaders.value[y])
+  for(let x = 0; x < rowNum; x++) {
+    setCell(x, y, colHeaders.value[y])
   }
 }
 const toggleRow = (x: number) => {
   rowHeaders.value[x] = !rowHeaders.value[x]
-  for(let y = 0; y < map.value[x].length; y++) {
-    setDate(x, y, rowHeaders.value[x])
+  for(let y = 0; y < colNum; y++) {
+    setCell(x, y, rowHeaders.value[x])
   }
 }
-const clear = () => {
-  for(let i = 0; i < dates.value.length; i++) {
-    dates.value[i] = false
-  }
-}
+
 const disableCell = (x: number, y: number) => {
   const str = `${y+1}/${x+1}`
   return disableDates.value.concat(['2/30','2/31','4/31','6/31','9/31','11/31']).includes(str)
@@ -67,13 +84,60 @@ const cellText = (x: number, y: number) => {
   if(disableCell(x,y)) return ''
   return weekdayLabels.value[dayjs(`${year}-${y+1}-${x+1}`).day()]
 }
+const toggleWeekDay = async (onOff: boolean) => {
+  console.log('weekSelector', weekSelector.value, onOff)
+  const text = weekdayLabels.value[weekSelector.value.weekday]
+  for(let x = 0; x < rowNum; x ++) {
+    for(let y = weekSelector.value.fromMonth; y <= weekSelector.value.toMonth; y++) {
+      if(cellLabels.value[x*colNum+y] === text) {
+        setCell(x, y, onOff)
+      }
+    }
+  }
+}
+
+const initCellLabel = () => {
+  for(let x = 0; x < rowNum; x ++) {
+    for(let y = 0; y < colNum; y++) {
+      cellLabels.value[x*colNum+y] = weekdayLabels.value[dayjs(`${year}-${y+1}-${x+1}`).day()]
+    }
+  }
+}
+const clear = () => {
+  cells.value.fill(false)
+  rowHeaders.value.fill(false)
+  colHeaders.value.fill(false)
+  weekSelector.value = {
+    fromMonth: 1,
+    toMonth: 12,
+    weekday: 1,
+  }
+  initCellLabel()
+}
+
+clear()
 
 </script>
 <template lang="pug">
-//- div {{ map }}
 .text-left
   .btn(@click="clear") Clear
 .mt-8.relative.w-120
+  .text-left
+    div.text-lg.p-4.border 
+      div 快速選擇
+      span.ml-1 從
+      select.border(v-model='weekSelector.fromMonth')
+        option(v-for='(m, i) in 12', :value='i') {{ i+1 }}月
+      span.mx-1 到
+      select.border(v-model='weekSelector.toMonth')
+        option(v-for='(m, i) in 12', :value='i') {{ i+1 }}月
+      span.mx-1 的
+      select.border(v-model='weekSelector.weekday')
+        option(v-for='(m, i) in 7', :value='i') 周{{ weekdayLabels[i] }}
+      span.space-x-2.ml-4.text-sm
+        .btn(@click='toggleWeekDay(false)') 取消
+        .btn(@click='toggleWeekDay(true)') 打勾
+
   .year-box.row.flex.items-center
     .year-cell(v-for='i in (month-1)')
     .year-cell
@@ -95,7 +159,7 @@ const cellText = (x: number, y: number) => {
       :class="{ active: map[x][y], disabled: disableCell(x,y) }"
     ) {{ cellText(x,y) }}
 </template>
-<style lang="scss">
+<style lang="scss" scoped>
 .year-box {
   height: 100px;
   .line {

@@ -1,8 +1,21 @@
 {
-  "name": "date-marker",
-  "version": "0.0.1",
+  "name": "@alstoncao/date-marker",
+  "version": "0.0.2",
+  "main": "./dist/date-marker.umd.js",
+  "module": "./dist/date-marker.es.js",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/date-marker.es.js",
+      "require": "./dist/date-marker.umd.js"
+    },
+    "./style.css": "./dist/style.css"
+  },
+  "types": "./dist/index.d.ts",
   "type": "module",
-  "private": true,
   "packageManager": "pnpm@9.1.2",
   "scripts": {
     "build": "vite build",
@@ -15,7 +28,9 @@
     "postinstall": "npx simple-git-hooks"
   },
   "dependencies": {
+    "@vue/language-plugin-pug": "^2.0.29",
     "@vueuse/core": "^10.9.0",
+    "alstoncao/date-marker": "file:./alstoncao-date-marker-0.0.2.tgz",
     "dayjs": "^1.11.12",
     "pug": "^3.0.3",
     "vue": "^3.4.27",
@@ -34,6 +49,7 @@
     "@vue/test-utils": "^2.4.6",
     "eslint": "^9.3.0",
     "eslint-plugin-format": "^0.1.1",
+    "eslint-plugin-vue-pug": "^0.6.2",
     "jsdom": "^24.0.0",
     "lint-staged": "^15.2.2",
     "pnpm": "^9.1.1",
@@ -47,14 +63,9 @@
     "unplugin-vue-macros": "^2.9.2",
     "unplugin-vue-router": "^0.8.6",
     "vite": "^5.2.11",
+    "vite-plugin-dts": "4.0.0-beta.1",
     "vite-plugin-pug": "^0.3.2",
     "vitest": "^1.6.0",
     "vue-tsc": "^2.0.19"
-  },
-  "simple-git-hooks": {
-    "pre-commit": "pnpm lint-staged"
-  },
-  "lint-staged": {
-    "*": "eslint --fix"
   }
 }
